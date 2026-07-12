@@ -89,15 +89,24 @@ function richTextAllBold(richTextArr) {
 }
 
 // Flatten blocks jadi list segmen { type, text, bold }, resolve synced_block secara rekursif.
+//
+// PENTING: buat synced_block, JANGAN manual redirect ke synced_block.synced_from.block_id.
+// Notion API otomatis nge-resolve isi synced block kalau kita minta children dari ID
+// synced_block itu sendiri (baik dia "original" maupun "reference copy") — manual redirect
+// ke synced_from malah sering 404 karena block sumber aslinya belum tentu ke-share ke
+// integration, walau salinannya di halaman ini udah ke-share.
 async function flattenPageBlocks(pageId) {
   const top = await getBlockChildren(pageId);
   const out = [];
   for (const b of top) {
     if (b.type === "synced_block") {
-      const childId = b.synced_block.synced_from ? b.synced_block.synced_from.block_id : b.id;
-      const children = await getBlockChildren(childId);
-      for (const c of children) {
-        pushFlattened(out, c);
+      try {
+        const children = await getBlockChildren(b.id);
+        for (const c of children) {
+          pushFlattened(out, c);
+        }
+      } catch (e) {
+        console.warn("Gagal baca synced_block", b.id, e.message);
       }
     } else {
       pushFlattened(out, b);
@@ -208,10 +217,16 @@ module.exports = async (req, res) => {
     const lastYear = new Date(now);
     lastYear.setFullYear(now.getFullYear() - 1);
 
-    const [throwback, quotes] = await Promise.all([
+    const [throwbackResult, quotesResult] = await Promise.allSettled([
       findThrowback(lastYear.getDate(), lastYear.getMonth(), lastYear.getFullYear()),
       collectQuotes(),
     ]);
+
+    if (throwbackResult.status === "rejected") console.error("findThrowback gagal:", throwbackResult.reason);
+    if (quotesResult.status === "rejected") console.error("collectQuotes gagal:", quotesResult.reason);
+
+    const throwback = throwbackResult.status === "fulfilled" ? throwbackResult.value : null;
+    const quotes = quotesResult.status === "fulfilled" ? quotesResult.value : [];
 
     res.setHeader("Cache-Control", "s-maxage=120, stale-while-revalidate=300");
     res.status(200).json({ throwback, quotes });
