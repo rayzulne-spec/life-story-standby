@@ -1,6 +1,8 @@
 // Service worker minimal — cukup buat bikin halaman ini "installable" di HP.
 // Gak nge-cache data /api/entries (biar selalu fresh), cuma cache file statis.
-const CACHE = "life-story-standby-v1";
+// Naikin angka versi ini tiap kali style.css / app.js / index.html berubah,
+// biar service worker buang cache lama dan ambil file baru.
+const CACHE = "life-story-standby-v2";
 const ASSETS = ["/", "/index.html", "/style.css", "/app.js", "/manifest.json", "/icon.svg"];
 
 self.addEventListener("install", (e) => {
