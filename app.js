@@ -113,15 +113,17 @@ async function loadData() {
   }
   renderMemory();
   renderCarousel();
+  quoteIdx = 0;
+  renderRotatingQuote(); // langsung refresh quote begitu data asli kelar di-fetch, jangan nunggu interval 8 detik
 }
 
 tickClock();
 setInterval(tickClock, 1000);
 
+renderRotatingQuote(); // tampilin sesuatu duluan (dummy) sambil nunggu fetch pertama kelar
 loadData();
 setInterval(loadData, 5 * 60 * 1000); // refresh tiap 5 menit
 
-renderRotatingQuote();
 setInterval(renderRotatingQuote, 8000);
 
 if ("serviceWorker" in navigator) {
