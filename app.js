@@ -81,10 +81,18 @@ function renderCarousel() {
     card.style.width = w + "px";
     card.style.height = h + "px";
     card.style.background = `linear-gradient(160deg, ${c1}, ${c2})`;
-    card.style.left = (i * 21) % 90 + "%";
-    card.style.top = (i * 27) % 80 + "%";
-    card.style.setProperty("--rot", `${(i % 2 === 0 ? -1 : 1) * (4 + (i % 3) * 3)}deg`);
-    card.style.setProperty("--delay", `${i * -3.5}s`);
+
+    // Tiap kartu jalan di "lane" vertikal beda-beda, kecepatan & delay acak-ish,
+    // biar orbitnya kerasa organik gak baris rapi/sinkron.
+    const lanes = 4;
+    const lane = i % lanes;
+    card.style.top = (8 + lane * (78 / (lanes - 1))) + "%";
+    const dur = 26 + ((i * 7) % 20); // 26–45s, tiap kartu beda kecepatan
+    const delay = -((i * dur) / 6); // negatif = mulai di tengah animasi, biar langsung rame gak nunggu satu putaran
+    const bob = (i % 2 === 0 ? -1 : 1) * (18 + (i % 3) * 10);
+    card.style.setProperty("--dur", `${dur}s`);
+    card.style.setProperty("--delay", `${delay}s`);
+    card.style.setProperty("--bob", `${bob}px`);
     card.innerHTML = `
       <div class="cap">${q.text.length > 28 ? q.text.slice(0, 26) + "…" : q.text}</div>
       <div class="big-date">${pad(q.day)} ${BULAN_SINGKAT[q.monthIdx]}</div>

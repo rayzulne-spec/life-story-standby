@@ -156,14 +156,29 @@ html, body {
 
 .mem-card {
   position: absolute;
+  left: 0;
   border-radius: 22px;
   border: 3px solid rgba(255,255,255,0.8);
   padding: 18px 20px;
   color: #fff;
   overflow: hidden;
   box-shadow: 0 14px 30px rgba(0,0,0,0.18);
-  animation: drift 40s linear infinite;
+  animation-name: orbit;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-duration: var(--dur, 32s);
   animation-delay: var(--delay, 0s);
+  will-change: transform, opacity;
+}
+
+/* Kartu masuk dari luar frame kanan, muter (rotate) sambil ngelintas,
+   lalu keluar frame lagi di sisi kiri — looping terus, kek orbit. */
+@keyframes orbit {
+  0%   { transform: translateX(130vw) translateY(0) rotate(0deg) scale(0.82); opacity: 0; }
+  8%   { opacity: 1; }
+  50%  { transform: translateX(15vw) translateY(var(--bob, -26px)) rotate(180deg) scale(1.08); opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translateX(-130vw) translateY(0) rotate(360deg) scale(0.82); opacity: 0; }
 }
 
 .mem-card .cap {
@@ -186,12 +201,6 @@ html, body {
   color: rgba(255,255,255,0.35);
   z-index: 1;
   white-space: nowrap;
-}
-
-@keyframes drift {
-  0%   { transform: translateY(6%) rotate(var(--rot, 0deg)); }
-  50%  { transform: translateY(-4%) rotate(var(--rot, 0deg)); }
-  100% { transform: translateY(6%) rotate(var(--rot, 0deg)); }
 }
 
 @media (max-width: 900px) {
