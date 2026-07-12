@@ -1,0 +1,9 @@
+{
+  "name": "life-story-standby",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LIFE STORY - layar Standby (Vercel: static frontend + /api/entries serverless function)",
+  "scripts": {
+    "dev": "vercel dev"
+  }
+}

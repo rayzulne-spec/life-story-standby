@@ -1,0 +1,200 @@
+:root {
+  --ink: #14120f;
+  --plum: #4100f5;
+  --plum-soft: #6a4bff;
+  --coral: #ea6e4b;
+  --tangerine: #ff4632;
+  --orchid: #d653a9;
+  --fushia: #f037a5;
+  --lilac: #cda8e2;
+  --aqua: #9bf0e1;
+  --sunny: #faf26f;
+  --paper: #efe6d0;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0c0a10;
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+
+.frame {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  border: 14px solid #0c0a10;
+  box-sizing: border-box;
+}
+
+.bg-decor {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* 1. Kenangan setahun lalu */
+.memory-card {
+  position: absolute;
+  top: 6%;
+  left: 4%;
+  width: 34%;
+  max-width: 520px;
+  background: var(--plum);
+  border-radius: 28px;
+  padding: 28px 30px;
+  z-index: 3;
+  box-shadow: 0 18px 40px rgba(65, 0, 245, 0.28);
+}
+
+.memory-date {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 800;
+  font-style: italic;
+  color: var(--lilac);
+  line-height: 0.92;
+  font-size: clamp(20px, 2.4vw, 30px);
+  margin-bottom: 10px;
+}
+
+.memory-date span { display: block; }
+
+.memory-text {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 500;
+  color: #fff;
+  font-size: clamp(15px, 1.5vw, 19px);
+  line-height: 1.35;
+  margin: 0;
+}
+
+/* 2. Quotes rotating */
+.rotating-quote {
+  position: absolute;
+  top: 40%;
+  left: 4%;
+  width: 34%;
+  max-width: 520px;
+  z-index: 3;
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 600;
+  color: #3a352f;
+  font-size: clamp(16px, 1.7vw, 21px);
+  line-height: 1.4;
+  transition: opacity 0.8s ease;
+}
+
+.rotating-quote.fade { opacity: 0; }
+
+/* 3. Jam & tanggal */
+.clock-block {
+  position: absolute;
+  left: 4%;
+  bottom: 6%;
+  z-index: 3;
+}
+
+.clock-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.clock-time {
+  font-family: 'Fraunces', serif;
+  font-weight: 900;
+  color: var(--ink);
+  font-size: clamp(56px, 8vw, 108px);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+}
+
+.clock-seconds {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 800;
+  color: var(--tangerine);
+  font-size: clamp(20px, 2.6vw, 34px);
+  margin-bottom: 10px;
+}
+
+.clock-date {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--plum);
+  font-size: clamp(20px, 3vw, 38px);
+  margin-top: 4px;
+  line-height: 1.1;
+}
+
+/* 4. Carousel kartu */
+.carousel-viewport {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 58%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 2;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+
+.carousel-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.mem-card {
+  position: absolute;
+  border-radius: 22px;
+  border: 3px solid rgba(255,255,255,0.8);
+  padding: 18px 20px;
+  color: #fff;
+  overflow: hidden;
+  box-shadow: 0 14px 30px rgba(0,0,0,0.18);
+  animation: drift 40s linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.mem-card .cap {
+  position: relative;
+  z-index: 2;
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.mem-card .big-date {
+  position: absolute;
+  right: 10px;
+  bottom: 4px;
+  font-family: 'Fraunces', serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 54px;
+  color: rgba(255,255,255,0.35);
+  z-index: 1;
+  white-space: nowrap;
+}
+
+@keyframes drift {
+  0%   { transform: translateY(6%) rotate(var(--rot, 0deg)); }
+  50%  { transform: translateY(-4%) rotate(var(--rot, 0deg)); }
+  100% { transform: translateY(6%) rotate(var(--rot, 0deg)); }
+}
+
+@media (max-width: 900px) {
+  .memory-card, .rotating-quote { width: 46%; }
+  .carousel-viewport { width: 100%; opacity: 0.35; }
+}

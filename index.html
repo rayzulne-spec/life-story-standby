@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+<title>LIFE STORY — Standby</title>
+<meta name="theme-color" content="#efe6d0" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;800;900&family=Space+Grotesk:wght@400;500;700&family=Fraunces:ital,wght@0,600;0,900;1,500;1,600&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="frame">
+    <!-- decorative background -->
+    <svg class="bg-decor" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <rect x="0" y="0" width="1200" height="800" fill="url(#bgGrad)"></rect>
+      <g opacity="0.25" fill="#EA6E4B">
+        <polygon points="120,-40 180,120 340,60 220,180 380,260 200,240 240,420 120,270 20,400 60,220 -100,260 40,120 -80,20 100,80" transform="translate(-20,0) scale(0.9)"></polygon>
+      </g>
+      <defs>
+        <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="0.4">
+          <stop offset="0%" stop-color="#EFE2C2"></stop>
+          <stop offset="55%" stop-color="#EAF2E2"></stop>
+          <stop offset="100%" stop-color="#DCEFE6"></stop>
+        </linearGradient>
+      </defs>
+    </svg>
+
+    <!-- 1. Kenangan setahun lalu -->
+    <section class="memory-card" id="memoryCard">
+      <div class="memory-date" id="memoryDate">
+        <span id="memDay">--</span>
+        <span id="memMonth">---</span>
+        <span id="memYear">----</span>
+      </div>
+      <p class="memory-text" id="memoryText">Memuat catatan setahun lalu…</p>
+    </section>
+
+    <!-- 2. Quotes (rotating) -->
+    <p class="rotating-quote" id="rotatingQuote">&nbsp;</p>
+
+    <!-- 3. Jam & tanggal -->
+    <section class="clock-block">
+      <div class="clock-row">
+        <span class="clock-time" id="clockTime">--:--</span><span class="clock-seconds" id="clockSeconds">--</span>
+      </div>
+      <div class="clock-date" id="clockDate">-- ------- ----</div>
+    </section>
+
+    <!-- 4. Kartu kenangan berputar -->
+    <div class="carousel-viewport">
+      <div class="carousel-track" id="carouselTrack">
+        <!-- cards injected by app.js -->
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
