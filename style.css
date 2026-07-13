@@ -68,11 +68,11 @@ html, body {
 .memory-date span { display: block; }
 
 .memory-text {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 500;
+  font-family: 'Caveat', cursive;
+  font-weight: 700;
   color: #fff;
-  font-size: clamp(15px, 1.5vw, 19px);
-  line-height: 1.35;
+  font-size: clamp(19px, 2vw, 25px);
+  line-height: 1.25;
   margin: 0;
 }
 
@@ -84,12 +84,11 @@ html, body {
   width: 34%;
   max-width: 520px;
   z-index: 3;
-  font-family: 'Fraunces', serif;
-  font-style: italic;
+  font-family: 'Caveat', cursive;
   font-weight: 600;
-  color: #3a352f;
-  font-size: clamp(16px, 1.7vw, 21px);
-  line-height: 1.4;
+  color: #6E6E6E;
+  font-size: clamp(19px, 2.2vw, 26px);
+  line-height: 1.2;
   transition: opacity 0.8s ease;
 }
 
@@ -110,24 +109,24 @@ html, body {
 }
 
 .clock-time {
-  font-family: 'Fraunces', serif;
-  font-weight: 900;
+  font-family: 'Bebas Neue', sans-serif;
+  font-weight: 400;
   color: var(--ink);
-  font-size: clamp(56px, 8vw, 108px);
+  font-size: clamp(64px, 9vw, 128px);
   line-height: 0.9;
   letter-spacing: -0.02em;
 }
 
 .clock-seconds {
   font-family: 'Unbounded', sans-serif;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--tangerine);
   font-size: clamp(20px, 2.6vw, 34px);
   margin-bottom: 10px;
 }
 
 .clock-date {
-  font-family: 'Fraunces', serif;
+  font-family: 'Playfair Display', serif;
   font-style: italic;
   font-weight: 600;
   color: var(--plum);
@@ -184,18 +183,17 @@ html, body {
 .mem-card .cap {
   position: relative;
   z-index: 2;
-  font-family: 'Fraunces', serif;
-  font-style: italic;
+  font-family: 'Caveat', cursive;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 19px;
 }
 
 .mem-card .big-date {
   position: absolute;
   right: 10px;
   bottom: 4px;
-  font-family: 'Fraunces', serif;
-  font-weight: 900;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
   font-style: italic;
   font-size: 54px;
   color: rgba(255,255,255,0.35);
