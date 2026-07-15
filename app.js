@@ -82,9 +82,9 @@ function renderCarousel() {
   const list = state.quotes || [];
   if (!list.length) return;
 
-  const W = track.clientWidth || track.offsetWidth || 500;
-  const H = track.clientHeight || track.offsetHeight || 200;
-  const base = Math.min(W, H,);
+  const W = track.clientWidth || track.offsetWidth || 800;
+  const H = track.clientHeight || track.offsetHeight || 600;
+  const base = Math.min(W, H);
 
   // Hub ditaruh agak ke kanan biar kartu nyapu keluar-masuk sisi kanan frame.
   const hubX = W * 0.82;
@@ -190,6 +190,21 @@ window.addEventListener("resize", () => {
   _resizeTO = setTimeout(renderCarousel, 200);
 });
 
+// Auto-update buat PWA (biar yang ke-install di HP ikut ke-refresh sendiri
+// tiap ada deploy baru di Vercel, tanpa perlu uninstall manual).
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js").catch(() => {});
+  navigator.serviceWorker.register("sw.js").then((reg) => {
+    // Cek versi baru tiap 15 menit (dan sekali pas halaman kebuka).
+    reg.update();
+    setInterval(() => reg.update(), 15 * 60 * 1000);
+  }).catch(() => {});
+
+  // Begitu service worker baru mengambil alih, muat ulang halaman sekali
+  // biar langsung pakai file terbaru. Flag 'refreshing' cegah reload berulang.
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (refreshing) return;
+    refreshing = true;
+    location.reload();
+  });
 }
