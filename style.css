@@ -33,6 +33,17 @@ html, body {
   box-sizing: border-box;
 }
 
+/* Dekor background muter pelan */
+.bg-spin {
+  transform-box: fill-box;      /* titik putar dihitung dari kotak gambar sendiri */
+  transform-origin: center;     /* muter di titik tengah gambar, bukan pojok */
+  animation: bg-rotate 60s linear infinite;
+}
+
+@keyframes bg-rotate {
+  to { transform: rotate(360deg); }
+}
+
 .bg-decor {
   position: absolute;
   inset: 0;
