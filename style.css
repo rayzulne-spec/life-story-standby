@@ -33,17 +33,6 @@ html, body {
   box-sizing: border-box;
 }
 
-/* Dekor background muter pelan */
-.spin {
-  transform-box: fill-box;      /* titik putar dihitung dari kotak gambar sendiri */
-  transform-origin: center;     /* muter di titik tengah gambar, bukan pojok */
-  animation: bg-rotate 60s linear infinite;
-}
-
-@keyframes bg-rotate {
-  to { transform: rotate(360deg); }
-}
-
 .bg-decor {
   position: absolute;
   inset: 0;
@@ -52,37 +41,46 @@ html, body {
   z-index: 0;
 }
 
-/* 1. Kenangan setahun lalu */
+/* 1. Kenangan setahun lalu — layout 2 kolom: tanggal kiri, isi kanan */
 .memory-card {
   position: absolute;
   top: 6%;
   left: 4%;
-  width: 34%;
-  max-width: 520px;
+  width: 40%;
+  max-width: 600px;
+  /* dua kolom sejajar biar nggak makan tempat ke bawah */
+  display: flex;
+  align-items: center;
+  gap: 22px;
   /* Glassmorphism: background semi-transparan biar blur di belakangnya kelihatan */
   background: rgba(65, 0, 245, 0.32);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 28px;
-  padding: 28px 30px;
+  padding: 22px 26px;
   z-index: 3;
   box-shadow: 0 18px 40px rgba(65, 0, 245, 0.28);
 }
 
 .memory-date {
+  flex: 0 0 auto;          /* kolom kiri: selebar isinya, nggak ikut melar */
   font-family: 'Unbounded', sans-serif;
   font-weight: 800;
   font-style: italic;
   color: var(--lilac);
   line-height: 0.92;
   font-size: clamp(20px, 2.4vw, 30px);
-  margin-bottom: 10px;
+  margin-bottom: 0;
+  /* garis pemisah tipis di kanan tanggal */
+  padding-right: 20px;
+  border-right: 2px solid rgba(255, 255, 255, 0.22);
 }
 
 .memory-date span { display: block; }
 
 .memory-text {
+  flex: 1;                 /* kolom kanan: isi sisa ruang */
   font-family: 'Caveat', cursive;
   font-weight: 700;
   color: #fff;
@@ -275,15 +273,4 @@ html, body {
 @media (max-width: 900px) {
   .memory-card, .rotating-quote { width: 46%; }
   .carousel-viewport { width: 100%; opacity: 0.35; }
-}
-
-/* Dekor background muter pelan */
-.bg-spin {
-  transform-box: fill-box;      /* titik putar dihitung dari kotak gambar sendiri */
-  transform-origin: center;     /* muter di titik tengah gambar, bukan pojok */
-  animation: bg-rotate 60s linear infinite;
-}
-
-@keyframes bg-rotate {
-  to { transform: rotate(360deg); }
 }
