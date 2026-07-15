@@ -34,7 +34,7 @@ html, body {
 }
 
 /* Dekor background muter pelan */
-.bg-spin {
+.spin {
   transform-box: fill-box;      /* titik putar dihitung dari kotak gambar sendiri */
   transform-origin: center;     /* muter di titik tengah gambar, bukan pojok */
   animation: bg-rotate 60s linear infinite;
@@ -275,4 +275,15 @@ html, body {
 @media (max-width: 900px) {
   .memory-card, .rotating-quote { width: 46%; }
   .carousel-viewport { width: 100%; opacity: 0.35; }
+}
+
+/* Dekor background muter pelan */
+.bg-spin {
+  transform-box: fill-box;      /* titik putar dihitung dari kotak gambar sendiri */
+  transform-origin: center;     /* muter di titik tengah gambar, bukan pojok */
+  animation: bg-rotate 60s linear infinite;
+}
+
+@keyframes bg-rotate {
+  to { transform: rotate(360deg); }
 }
