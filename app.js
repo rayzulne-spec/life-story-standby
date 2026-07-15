@@ -74,6 +74,26 @@ function renderCarousel() {
   const list = state.quotes || [];
   list.forEach((q, i) => {
     const [c1, c2] = CARD_COLORS[i % CARD_COLORS.length];
+
+    // Pivot = titik pusat orbit buat kartu ini. Tiap kartu boleh punya pusat
+    // sedikit beda (--cx/--cy) biar orbitnya gak semua muter di titik yang
+    // persis sama — kesannya lebih kayak medan kartu yang saling tumpang tindih.
+    const pivot = document.createElement("div");
+    pivot.className = "orbit-pivot";
+    const cx = 40 + (i % 3) * 15; // 40–70%
+    const cy = 25 + (i % 4) * 18; // 25–79%
+    const radius = 260 + (i % 4) * 110; // 260–590px, tiap "lane" beda jarak dari pusat
+    const dur = 28 + ((i * 9) % 26); // 28–54s, tiap kartu beda kecepatan
+    const dir = i % 2 === 0 ? "normal" : "reverse"; // separo muter searah jarum jam, separo kebalik
+    const delay = -((i * dur) / 5); // biar langsung rame gak nunggu satu putaran penuh
+    const tilt = (i % 2 === 0 ? -1 : 1) * (4 + (i % 3) * 4);
+
+    pivot.style.setProperty("--cx", cx + "%");
+    pivot.style.setProperty("--cy", cy + "%");
+    pivot.style.setProperty("--dur", `${dur}s`);
+    pivot.style.setProperty("--delay", `${delay}s`);
+    pivot.style.setProperty("--dir", dir);
+
     const card = document.createElement("div");
     card.className = "mem-card";
     const w = 220 + (i % 3) * 40;
@@ -81,23 +101,17 @@ function renderCarousel() {
     card.style.width = w + "px";
     card.style.height = h + "px";
     card.style.background = `linear-gradient(160deg, ${c1}, ${c2})`;
-
-    // Tiap kartu jalan di "lane" vertikal beda-beda, kecepatan & delay acak-ish,
-    // biar orbitnya kerasa organik gak baris rapi/sinkron.
-    const lanes = 4;
-    const lane = i % lanes;
-    card.style.top = (8 + lane * (78 / (lanes - 1))) + "%";
-    const dur = 26 + ((i * 7) % 20); // 26–45s, tiap kartu beda kecepatan
-    const delay = -((i * dur) / 6); // negatif = mulai di tengah animasi, biar langsung rame gak nunggu satu putaran
-    const bob = (i % 2 === 0 ? -1 : 1) * (18 + (i % 3) * 10);
+    card.style.setProperty("--radius", radius + "px");
     card.style.setProperty("--dur", `${dur}s`);
     card.style.setProperty("--delay", `${delay}s`);
-    card.style.setProperty("--bob", `${bob}px`);
+    card.style.setProperty("--dir", dir);
+    card.style.setProperty("--tilt", `${tilt}deg`);
     card.innerHTML = `
       <div class="cap">${q.text.length > 28 ? q.text.slice(0, 26) + "…" : q.text}</div>
       <div class="big-date">${pad(q.day)} ${BULAN_SINGKAT[q.monthIdx]}</div>
     `;
-    track.appendChild(card);
+    pivot.appendChild(card);
+    track.appendChild(pivot);
   });
 }
 

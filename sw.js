@@ -2,7 +2,7 @@
 // Gak nge-cache data /api/entries (biar selalu fresh), cuma cache file statis.
 // Naikin angka versi ini tiap kali style.css / app.js / index.html berubah,
 // biar service worker buang cache lama dan ambil file baru.
-const CACHE = "life-story-standby-v2";
+const CACHE = "life-story-standby-v3";
 const ASSETS = ["/", "/index.html", "/style.css", "/app.js", "/manifest.json", "/icon.svg"];
 
 self.addEventListener("install", (e) => {
