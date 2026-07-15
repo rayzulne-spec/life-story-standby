@@ -83,7 +83,7 @@ function renderCarousel() {
   if (!list.length) return;
 
   const W = track.clientWidth || track.offsetWidth || 500;
-  const H = track.clientHeight || track.offsetHeight || 600;
+  const H = track.clientHeight || track.offsetHeight || 200;
   const base = Math.min(W, H,);
 
   // Hub ditaruh agak ke kanan biar kartu nyapu keluar-masuk sisi kanan frame.
