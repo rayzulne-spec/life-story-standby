@@ -24,6 +24,8 @@ const DUMMY = {
     { day: 2, monthIdx: 1, year: 2025, text: "lari pagi pertama" },
     { day: 30, monthIdx: 8, year: 2025, text: "pindah kosan" },
     { day: 21, monthIdx: 0, year: 2025, text: "midnight movie" },
+    { day: 3, monthIdx: 4, year: 2025, text: "senja di rooftop" },
+    { day: 28, monthIdx: 3, year: 2025, text: "kopi & hujan deras" },
   ]
 };
 
@@ -68,50 +70,91 @@ function renderRotatingQuote() {
   }, 400);
 }
 
+// Orbit dua cincin — niru "Life Story Standby":
+// - cincin luar: kartu gede, muter searah jarum jam (80s)
+// - cincin dalam: kartu lebih kecil, muter kebalik & lebih cepat (58s)
+// Dua-duanya ngelilingin satu hub yang sama. Tiap kartu di-counter-rotate
+// jadi POSISI-nya nyapu masuk-keluar frame tapi ORIENTASI-nya tetap tegak
+// (teks kebaca terus).
 function renderCarousel() {
   const track = document.getElementById("carouselTrack");
   track.innerHTML = "";
   const list = state.quotes || [];
-  list.forEach((q, i) => {
-    const [c1, c2] = CARD_COLORS[i % CARD_COLORS.length];
+  if (!list.length) return;
 
-    // Pivot = titik pusat orbit buat kartu ini. Tiap kartu boleh punya pusat
-    // sedikit beda (--cx/--cy) biar orbitnya gak semua muter di titik yang
-    // persis sama — kesannya lebih kayak medan kartu yang saling tumpang tindih.
-    const pivot = document.createElement("div");
-    pivot.className = "orbit-pivot";
-    const cx = 40 + (i % 3) * 15; // 40–70%
-    const cy = 25 + (i % 4) * 18; // 25–79%
-    const radius = 260 + (i % 4) * 110; // 260–590px, tiap "lane" beda jarak dari pusat
-    const dur = 28 + ((i * 9) % 26); // 28–54s, tiap kartu beda kecepatan
-    const dir = i % 2 === 0 ? "normal" : "reverse"; // separo muter searah jarum jam, separo kebalik
-    const delay = -((i * dur) / 5); // biar langsung rame gak nunggu satu putaran penuh
-    const tilt = (i % 2 === 0 ? -1 : 1) * (4 + (i % 3) * 4);
+  const W = track.clientWidth || track.offsetWidth || 800;
+  const H = track.clientHeight || track.offsetHeight || 600;
+  const base = Math.min(W, H);
 
-    pivot.style.setProperty("--cx", cx + "%");
-    pivot.style.setProperty("--cy", cy + "%");
-    pivot.style.setProperty("--dur", `${dur}s`);
-    pivot.style.setProperty("--delay", `${delay}s`);
-    pivot.style.setProperty("--dir", dir);
+  // Hub ditaruh agak ke kanan biar kartu nyapu keluar-masuk sisi kanan frame.
+  const hubX = W * 0.82;
+  const hubY = H * 0.5;
 
-    const card = document.createElement("div");
-    card.className = "mem-card";
-    const w = 220 + (i % 3) * 40;
-    const h = 150 + (i % 2) * 60;
-    card.style.width = w + "px";
-    card.style.height = h + "px";
-    card.style.background = `linear-gradient(160deg, ${c1}, ${c2})`;
-    card.style.setProperty("--radius", radius + "px");
-    card.style.setProperty("--dur", `${dur}s`);
-    card.style.setProperty("--delay", `${delay}s`);
-    card.style.setProperty("--dir", dir);
-    card.style.setProperty("--tilt", `${tilt}deg`);
-    card.innerHTML = `
-      <div class="cap">${q.text.length > 28 ? q.text.slice(0, 26) + "…" : q.text}</div>
-      <div class="big-date">${pad(q.day)} ${BULAN_SINGKAT[q.monthIdx]}</div>
-    `;
-    pivot.appendChild(card);
-    track.appendChild(pivot);
+  // Glow di tengah hub (sesuai referensi).
+  const hub = document.createElement("div");
+  hub.className = "orbit-hub";
+  hub.style.left = hubX + "px";
+  hub.style.top = hubY + "px";
+  hub.style.width = base * 0.22 + "px";
+  hub.style.height = base * 0.22 + "px";
+  track.appendChild(hub);
+
+  // Isi tiap cincin dari quotes; kalau datanya dikit, diulang biar cincin penuh.
+  const fill = (n) => Array.from({ length: n }, (_, i) => list[i % list.length]);
+  const outer = fill(Math.min(7, Math.max(5, list.length)));
+  const innerCount = Math.min(5, Math.max(3, list.length - 1));
+  const inner = fill(innerCount).map((_, i) => list[(i + 1) % list.length]);
+
+  const rings = [
+    { data: outer, radius: base * 0.42, cardW: base * 0.34, cardH: base * 0.24, dur: 80, dir: "normal",  colorOffset: 0 },
+    { data: inner, radius: base * 0.26, cardW: base * 0.22, cardH: base * 0.20, dur: 58, dir: "reverse", colorOffset: 2 },
+  ];
+
+  rings.forEach((cfg) => {
+    const ring = document.createElement("div");
+    ring.className = "orbit-ring" + (cfg.dir === "reverse" ? " rev" : "");
+    ring.style.left = hubX + "px";
+    ring.style.top = hubY + "px";
+    ring.style.setProperty("--dur", cfg.dur + "s");
+
+    const n = cfg.data.length;
+    cfg.data.forEach((q, i) => {
+      const t = (360 / n) * i; // sudut slot kartu di lingkaran
+
+      const [c1, c2] = CARD_COLORS[(cfg.colorOffset + i) % CARD_COLORS.length];
+
+      // slot: naruh kartu di posisi sudut t, sejauh radius dari hub
+      const slot = document.createElement("div");
+      slot.className = "orbit-slot";
+      slot.style.transform = `rotate(${t}deg) translateX(${cfg.radius}px)`;
+
+      // spin-counter: muter balik sama cepat dgn cincin → hapus rotasi orbit
+      const spinCounter = document.createElement("div");
+      spinCounter.className = "orbit-spin-counter";
+      spinCounter.style.setProperty("--dur", cfg.dur + "s");
+
+      // counter: hapus offset sudut slot → kartu balik tegak
+      const counter = document.createElement("div");
+      counter.className = "orbit-counter";
+      counter.style.transform = `rotate(${-t}deg)`;
+
+      const card = document.createElement("div");
+      card.className = "ocard";
+      card.style.width = cfg.cardW + "px";
+      card.style.height = cfg.cardH + "px";
+      card.style.background = `linear-gradient(150deg, ${c1}, ${c2})`;
+      card.innerHTML = `
+        <div class="cap">${q.text.length > 28 ? q.text.slice(0, 26) + "…" : q.text}</div>
+        <div class="big-date">${pad(q.day)} ${BULAN_SINGKAT[q.monthIdx]}</div>
+      `;
+
+      counter.appendChild(card);
+      spinCounter.appendChild(counter);
+      slot.appendChild(spinCounter);
+      ring.appendChild(slot);
+    });
+
+    track.appendChild(ring);
   });
 }
 
@@ -139,6 +182,13 @@ loadData();
 setInterval(loadData, 5 * 60 * 1000); // refresh tiap 5 menit
 
 setInterval(renderRotatingQuote, 8000);
+
+// Ukur ulang orbit kalau jendela di-resize (radius & ukuran kartu ngikut layar).
+let _resizeTO;
+window.addEventListener("resize", () => {
+  clearTimeout(_resizeTO);
+  _resizeTO = setTimeout(renderCarousel, 200);
+});
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js").catch(() => {});
