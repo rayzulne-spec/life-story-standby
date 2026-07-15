@@ -82,7 +82,7 @@ function renderCarousel() {
   const list = state.quotes || [];
   if (!list.length) return;
 
-  const W = track.clientWidth || track.offsetWidth || 900;
+  const W = track.clientWidth || track.offsetWidth || 500;
   const H = track.clientHeight || track.offsetHeight || 600;
   const base = Math.min(W, H,);
 
