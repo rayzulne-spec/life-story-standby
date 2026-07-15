@@ -82,9 +82,9 @@ function renderCarousel() {
   const list = state.quotes || [];
   if (!list.length) return;
 
-  const W = track.clientWidth || track.offsetWidth || 800;
+  const W = track.clientWidth || track.offsetWidth || 900;
   const H = track.clientHeight || track.offsetHeight || 600;
-  const base = Math.min(W, H, 540);
+  const base = Math.min(W, H,);
 
   // Hub ditaruh agak ke kanan biar kartu nyapu keluar-masuk sisi kanan frame.
   const hubX = W * 0.82;
