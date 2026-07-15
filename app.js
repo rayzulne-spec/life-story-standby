@@ -84,7 +84,7 @@ function renderCarousel() {
 
   const W = track.clientWidth || track.offsetWidth || 800;
   const H = track.clientHeight || track.offsetHeight || 600;
-  const base = Math.min(W, H);
+  const base = Math.min(W, H, 540);
 
   // Hub ditaruh agak ke kanan biar kartu nyapu keluar-masuk sisi kanan frame.
   const hubX = W * 0.82;
