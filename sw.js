@@ -1,8 +1,9 @@
 // Service worker minimal — cukup buat bikin halaman ini "installable" di HP.
-// Gak nge-cache data /api/entries (biar selalu fresh), cuma cache file statis.
-// Naikin angka versi ini tiap kali style.css / app.js / index.html berubah,
-// biar service worker buang cache lama dan ambil file baru.
-const CACHE = "life-story-standby-v4";
+// Strategi: NETWORK-FIRST buat file statis (html/css/js). Jadi tiap deploy baru,
+// reload biasa langsung ambil file terbaru dari server; cache cuma dipakai kalau
+// offline. Ini bikin kamu gak perlu naikin versi manual tiap edit style.css/app.js.
+// /api/entries gak pernah di-cache biar datanya selalu fresh.
+const CACHE = "life-story-standby-v5";
 const ASSETS = ["/", "/index.html", "/style.css", "/app.js", "/manifest.json", "/icon.svg"];
 
 self.addEventListener("install", (e) => {
@@ -12,15 +13,26 @@ self.addEventListener("install", (e) => {
 
 self.addEventListener("activate", (e) => {
   e.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
+    )
   );
   self.clients.claim();
 });
 
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
-  if (url.pathname.startsWith("/api/")) return; // selalu live, jangan di-cache
+  if (url.pathname.startsWith("/api/")) return; // selalu live, jangan disentuh
+
+  // NETWORK-FIRST: coba ambil dari server dulu, simpan ke cache buat cadangan.
+  // Kalau offline / server gagal, baru jatuh ke cache lama.
   e.respondWith(
-    caches.match(e.request).then((cached) => cached || fetch(e.request))
+    fetch(e.request)
+      .then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(e.request, copy));
+        return res;
+      })
+      .catch(() => caches.match(e.request))
   );
 });
