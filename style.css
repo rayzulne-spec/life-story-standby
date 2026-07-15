@@ -81,7 +81,7 @@ html, body {
 
 .memory-text {
   flex: 1;                 /* kolom kanan: isi sisa ruang */
-  font-family: 'Caveat', cursive;
+  font-family: Helvetica, Arial, sans-serif;
   font-weight: 700;
   color: #fff;
   font-size: clamp(19px, 2vw, 25px);
@@ -97,8 +97,9 @@ html, body {
   width: 34%;
   max-width: 520px;
   z-index: 3;
-  font-family: 'Caveat', cursive;
-  font-weight: 600;
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  font-style: italic;
   color: #6E6E6E;
   font-size: clamp(19px, 2.2vw, 26px);
   line-height: 1.2;
@@ -250,9 +251,9 @@ html, body {
 .ocard .cap {
   position: relative;
   z-index: 2;
-  font-family: 'Caveat', cursive;
-  font-weight: 600;
-  font-style: italic;
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-style: normal;
   font-size: clamp(14px, 1.4vw, 20px);
   letter-spacing: -0.3px;
 }
