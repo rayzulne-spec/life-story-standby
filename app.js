@@ -120,6 +120,23 @@ function escapeHtml(s) {
   }[c]));
 }
 
+// Ambil satu kalimat yang mengandung kata yang dicari (biar hasil langsung relevan).
+function relevantSentence(text, q) {
+  if (!text) return "";
+  const clean = text.replace(/\s+/g, " ").trim();
+  const parts = clean.split(/(?<=[.!?…])\s+/); // pecah kasar per kalimat
+  const hit = parts.find((s) => s.toLowerCase().includes(q));
+  return (hit || clean).trim();
+}
+
+// Tebalkan + warnain kata yang dicari di dalam teks (aman dari HTML injection).
+function highlightHtml(text, q) {
+  const esc = escapeHtml(text);
+  if (!q) return esc;
+  const safe = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // escape regex
+  return esc.replace(new RegExp("(" + safe + ")", "gi"), '<span class="hl">$1</span>');
+}
+
 function ensureSpotlight() {
   let ov = document.getElementById("spotlight");
   if (ov) return ov;
@@ -177,12 +194,14 @@ function runSearch(query) {
   box.innerHTML = "";
   hits.forEach((d) => {
     const dateLabel = `${pad(d.day)} ${BULAN_SINGKAT[d.monthIdx]} ${d.year}`;
-    const snippet = d.narrative || (d.quotes || []).join(" ");
+    const full = (d.narrative || "") + " " + (d.quotes || []).join(" ");
+    // tampilin kalimat yang menyebut nama itu, bukan awal narasi
+    const snippet = relevantSentence(full, q);
     const item = document.createElement("div");
     item.className = "spotlight__item";
     item.innerHTML = `
       <div class="spotlight__item-date">${dateLabel}</div>
-      <div class="spotlight__item-text">${escapeHtml(snippet)}</div>`;
+      <div class="spotlight__item-text">${highlightHtml(snippet, q)}</div>`;
     // klik hasil → buka catatan full-nya di modal
     item.addEventListener("click", () => {
       closeSpotlight();

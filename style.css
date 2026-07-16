@@ -312,11 +312,14 @@ html, body {
   width: min(680px, 92vw);
   max-height: 80vh;
   overflow-y: auto;
-  background: rgba(65, 0, 245, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  /* kaca gelap dgn semburat orange, senada Spotlight */
+  background: rgba(34, 20, 14, 0.82);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid rgba(234, 110, 75, 0.4);
   border-radius: 28px;
   padding: 44px 34px 34px;
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 154, 110, 0.22);
   transform: translateY(14px) scale(0.98);
   transition: transform 0.28s ease;
 }
@@ -342,7 +345,7 @@ html, body {
   font-family: 'Unbounded', sans-serif;
   font-weight: 800;
   font-style: italic;
-  color: var(--lilac);
+  color: #FFB088;
   font-size: clamp(18px, 2vw, 26px);
   margin-bottom: 14px;
 }
@@ -392,12 +395,13 @@ html, body {
 
 .spotlight__box {
   width: min(680px, 92vw);
-  background: rgba(255, 255, 255, 0.14);
+  /* kaca gelap dgn semburat orange (bukan hitam-putih polos) */
+  background: rgba(44, 26, 17, 0.5);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(234, 110, 75, 0.42);
   border-radius: 22px;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 154, 110, 0.25);
   overflow: hidden;
   animation: spotlight-pop 0.22s ease;
 }
@@ -423,22 +427,28 @@ html, body {
 .spotlight__results {
   max-height: 52vh;
   overflow-y: auto;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-top: 1px solid rgba(234, 110, 75, 0.28);
 }
 
 .spotlight__item {
   padding: 14px 26px;
   cursor: pointer;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 168, 120, 0.1);
 }
-.spotlight__item:hover { background: rgba(255, 255, 255, 0.12); }
+.spotlight__item:hover { background: rgba(234, 110, 75, 0.16); }
+
+/* nama yang dicari di-highlight orange */
+.spotlight__item-text .hl {
+  color: #FF9A6E;
+  font-weight: 700;
+}
 
 .spotlight__item-date {
   font-family: 'Unbounded', sans-serif;
   font-weight: 700;
   font-style: italic;
   font-size: 14px;
-  color: var(--lilac);
+  color: #FFB088;
   margin-bottom: 4px;
 }
 .spotlight__item-text {
