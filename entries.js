@@ -188,23 +188,32 @@ async function findThrowback(targetDay, targetMonthIdx, targetYear) {
   return { day: found.day, monthIdx: found.monthIdx, year: found.year, text: found.narrative };
 }
 
-async function collectQuotes(maxPages = 24) {
+// Scan semua page bulan, balikin SEMUA hari (buat search Fitur 4).
+async function collectAllDays(maxPages = 24) {
   const pages = await listMonthPages();
-  const quotes = [];
+  const all = [];
   for (const page of pages.slice(0, maxPages)) {
     try {
       const segments = await flattenPageBlocks(page.id);
       const days = segmentDays(segments);
       for (const d of days) {
-        for (const q of d.quotes) {
-          // FITUR 1: lampirkan 'narrative' = catatan full hari itu, biar frontend
-          // bisa nampilin pop-up catatan lengkap pas quote-nya di-tap.
-          quotes.push({ day: d.day, monthIdx: d.monthIdx, year: d.year, text: q, narrative: d.narrative });
-        }
+        all.push({ day: d.day, monthIdx: d.monthIdx, year: d.year, narrative: d.narrative, quotes: d.quotes });
       }
     } catch (e) {
       // satu halaman gagal (misal format aneh) jangan sampe gagalin semua
       console.warn("Gagal parse halaman", page.bulan, e.message);
+    }
+  }
+  return all;
+}
+
+// Derive daftar quote dari days: tiap block quote jadi satu entri, tetap bawa
+// 'narrative' (catatan full hari itu) buat pop-up Fitur 1.
+function quotesFromDays(days) {
+  const quotes = [];
+  for (const d of days) {
+    for (const q of d.quotes) {
+      quotes.push({ day: d.day, monthIdx: d.monthIdx, year: d.year, text: q, narrative: d.narrative });
     }
   }
   return quotes;
@@ -219,19 +228,20 @@ module.exports = async (req, res) => {
     const lastYear = new Date(now);
     lastYear.setFullYear(now.getFullYear() - 1);
 
-    const [throwbackResult, quotesResult] = await Promise.allSettled([
+    const [throwbackResult, daysResult] = await Promise.allSettled([
       findThrowback(lastYear.getDate(), lastYear.getMonth(), lastYear.getFullYear()),
-      collectQuotes(),
+      collectAllDays(),
     ]);
 
     if (throwbackResult.status === "rejected") console.error("findThrowback gagal:", throwbackResult.reason);
-    if (quotesResult.status === "rejected") console.error("collectQuotes gagal:", quotesResult.reason);
+    if (daysResult.status === "rejected") console.error("collectAllDays gagal:", daysResult.reason);
 
     const throwback = throwbackResult.status === "fulfilled" ? throwbackResult.value : null;
-    const quotes = quotesResult.status === "fulfilled" ? quotesResult.value : [];
+    const days = daysResult.status === "fulfilled" ? daysResult.value : [];
+    const quotes = quotesFromDays(days); // Fitur 1: quotes + narasi hari itu
 
     res.setHeader("Cache-Control", "s-maxage=120, stale-while-revalidate=300");
-    res.status(200).json({ throwback, quotes });
+    res.status(200).json({ throwback, quotes, days }); // Fitur 4: 'days' = semua hari buat search
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });

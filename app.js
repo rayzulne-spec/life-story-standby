@@ -29,6 +29,15 @@ const DUMMY = {
   ]
 };
 
+// Buat testing search lokal: bikin 'days' dari quotes dummy (di live, 'days' datang
+// dari /api/entries). Sengaja aku selipin beberapa nama orang biar bisa dicoba cari.
+DUMMY.days = DUMMY.quotes.map(q => ({
+  day: q.day, monthIdx: q.monthIdx, year: q.year,
+  narrative: q.narrative, quotes: [q.text],
+}));
+DUMMY.days[1].narrative += " Sheila bantu masak, Kukuh bawa balon.";
+DUMMY.days[6].narrative += " Ngobrolnya sama Sheila soal rencana pindah.";
+
 let state = DUMMY;
 let quoteIdx = 0;
 
@@ -104,6 +113,85 @@ function closeModal() {
   if (overlay) overlay.classList.remove("open");
 }
 
+// ---- FITUR 4: Spotlight search (cari nama orang di semua catatan) ----
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+}
+
+function ensureSpotlight() {
+  let ov = document.getElementById("spotlight");
+  if (ov) return ov;
+  ov = document.createElement("div");
+  ov.id = "spotlight";
+  ov.className = "spotlight";
+  ov.innerHTML = `
+    <div class="spotlight__box" role="dialog" aria-modal="true">
+      <input id="spotlightInput" class="spotlight__input" type="text"
+             placeholder="Cari nama orang…" autocomplete="off" spellcheck="false" />
+      <div class="spotlight__results" id="spotlightResults"></div>
+    </div>`;
+  document.body.appendChild(ov);
+  // klik area gelap di luar kotak = tutup
+  ov.addEventListener("click", (e) => { if (e.target === ov) closeSpotlight(); });
+  const input = ov.querySelector("#spotlightInput");
+  input.addEventListener("input", () => runSearch(input.value));
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeSpotlight();
+    if (e.key === "Enter") runSearch(input.value);
+  });
+  return ov;
+}
+
+function openSpotlight() {
+  const ov = ensureSpotlight();
+  ov.classList.add("open");
+  const input = ov.querySelector("#spotlightInput");
+  input.value = "";
+  ov.querySelector("#spotlightResults").innerHTML = "";
+  setTimeout(() => input.focus(), 50); // fokus biar keyboard langsung muncul
+}
+
+function closeSpotlight() {
+  const ov = document.getElementById("spotlight");
+  if (ov) ov.classList.remove("open");
+}
+
+function runSearch(query) {
+  const box = document.getElementById("spotlightResults");
+  if (!box) return;
+  const q = (query || "").trim().toLowerCase();
+  if (!q) { box.innerHTML = ""; return; }
+
+  const days = state.days || [];
+  const hits = days
+    .filter(d => ((d.narrative || "") + " " + (d.quotes || []).join(" ")).toLowerCase().includes(q))
+    .sort((a, b) => (b.year - a.year) || (b.monthIdx - a.monthIdx) || (b.day - a.day));
+
+  if (!hits.length) {
+    box.innerHTML = `<div class="spotlight__empty">Nggak ada catatan yang menyebut “${escapeHtml(query)}”.</div>`;
+    return;
+  }
+
+  box.innerHTML = "";
+  hits.forEach((d) => {
+    const dateLabel = `${pad(d.day)} ${BULAN_SINGKAT[d.monthIdx]} ${d.year}`;
+    const snippet = d.narrative || (d.quotes || []).join(" ");
+    const item = document.createElement("div");
+    item.className = "spotlight__item";
+    item.innerHTML = `
+      <div class="spotlight__item-date">${dateLabel}</div>
+      <div class="spotlight__item-text">${escapeHtml(snippet)}</div>`;
+    // klik hasil → buka catatan full-nya di modal
+    item.addEventListener("click", () => {
+      closeSpotlight();
+      openModal(dateLabel, d.narrative || snippet);
+    });
+    box.appendChild(item);
+  });
+}
+
 // Pasang listener tap di memory card (sekali aja pas load).
 (function wireMemoryTap() {
   const card = document.getElementById("memoryCard");
@@ -174,6 +262,18 @@ function renderCarousel() {
   hub.style.width = base * 0.22 + "px";
   hub.style.height = base * 0.22 + "px";
   track.appendChild(hub);
+
+  // Icon Sine.png di poros orbit — di-tap buat buka search Spotlight (Fitur 4).
+  const hubIcon = document.createElement("img");
+  hubIcon.className = "orbit-hub-icon";
+  hubIcon.src = "Sine.png";
+  hubIcon.alt = "Cari catatan";
+  hubIcon.title = "Cari nama orang";
+  hubIcon.style.left = hubX + "px";
+  hubIcon.style.top = hubY + "px";
+  hubIcon.style.width = base * 0.13 + "px";
+  hubIcon.addEventListener("click", openSpotlight);
+  track.appendChild(hubIcon);
 
   // Isi tiap cincin dari quotes; kalau datanya dikit, diulang biar cincin penuh.
   const fill = (n) => Array.from({ length: n }, (_, i) => list[i % list.length]);
