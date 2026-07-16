@@ -87,7 +87,16 @@ html, body {
   font-size: clamp(19px, 2vw, 25px);
   line-height: 1.25;
   margin: 0;
+  /* batasi maksimal 4 baris biar nggak makan layar; sisanya "…" */
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
+
+/* kartu yang bisa di-tap buat buka catatan full */
+.memory-card.tappable { cursor: pointer; }
+.memory-card.tappable:hover { box-shadow: 0 22px 48px rgba(65, 0, 245, 0.4); }
 
 /* 2. Quotes rotating */
 .rotating-quote {
@@ -107,6 +116,10 @@ html, body {
 }
 
 .rotating-quote.fade { opacity: 0; }
+
+/* quote bisa di-tap buat buka catatan full hari itu */
+.rotating-quote.tappable { cursor: pointer; }
+.rotating-quote.tappable:hover { color: var(--plum); }
 
 /* 3. Jam & tanggal */
 .clock-block {
@@ -274,4 +287,71 @@ html, body {
 @media (max-width: 900px) {
   .memory-card, .rotating-quote { width: 46%; }
   .carousel-viewport { width: 100%; opacity: 0.35; }
+}
+
+/* ---- Modal / pop-up catatan full ---- */
+.note-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(12, 10, 16, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  visibility: hidden;            /* disembunyiin default; nggak nutupin klik */
+  transition: opacity 0.28s ease, visibility 0.28s ease;
+}
+.note-modal.open { opacity: 1; visibility: visible; }
+
+.note-modal__card {
+  position: relative;
+  width: min(680px, 92vw);
+  max-height: 80vh;
+  overflow-y: auto;
+  background: rgba(65, 0, 245, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 28px;
+  padding: 44px 34px 34px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
+  transform: translateY(14px) scale(0.98);
+  transition: transform 0.28s ease;
+}
+.note-modal.open .note-modal__card { transform: translateY(0) scale(1); }
+
+.note-modal__close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+.note-modal__close:hover { background: rgba(255, 255, 255, 0.28); }
+
+.note-modal__date {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 800;
+  font-style: italic;
+  color: var(--lilac);
+  font-size: clamp(18px, 2vw, 26px);
+  margin-bottom: 14px;
+}
+
+.note-modal__body {
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  color: #fff;
+  font-size: clamp(17px, 1.7vw, 22px);
+  line-height: 1.5;
+  white-space: pre-wrap;         /* jaga baris baru dari catatan asli */
 }

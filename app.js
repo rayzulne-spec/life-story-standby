@@ -19,13 +19,13 @@ const DUMMY = {
     text: "akhirnya nyobain kedai kopi di ujung gang itu. hujan deras — kita malah duduk dua jam ngobrolin hal kecil yang hangat."
   },
   quotes: [
-    { day: 12, monthIdx: 6, year: 2025, text: "Hari biasa yang pengen aku ingat lama-lama." },
-    { day: 14, monthIdx: 2, year: 2025, text: "ulang tahun ibu" },
-    { day: 2, monthIdx: 1, year: 2025, text: "lari pagi pertama" },
-    { day: 30, monthIdx: 8, year: 2025, text: "pindah kosan" },
-    { day: 21, monthIdx: 0, year: 2025, text: "midnight movie" },
-    { day: 3, monthIdx: 4, year: 2025, text: "senja di rooftop" },
-    { day: 28, monthIdx: 3, year: 2025, text: "kopi & hujan deras" },
+    { day: 12, monthIdx: 6, year: 2025, text: "Hari biasa yang pengen aku ingat lama-lama.", narrative: "Bangun agak siang, terus ngopi di teras sambil dengerin hujan. Nggak ngapa-ngapain yang penting, tapi entah kenapa pengen aku ingat lama-lama." },
+    { day: 14, monthIdx: 2, year: 2025, text: "ulang tahun ibu", narrative: "Ulang tahun ibu. Masak bareng dari pagi, ketawa-ketawa di dapur. Malemnya potong kue kecil. Sederhana tapi hangat." },
+    { day: 2, monthIdx: 1, year: 2025, text: "lari pagi pertama", narrative: "Lari pagi pertama setelah lama nggak. Napas ngos-ngosan di 1 km pertama, tapi sisanya enak. Langitnya oranye bagus banget." },
+    { day: 30, monthIdx: 8, year: 2025, text: "pindah kosan", narrative: "Hari pindahan kosan. Capek angkat-angkat barang, tapi kamar baru kena sinar matahari pagi. Berasa mulai babak baru." },
+    { day: 21, monthIdx: 0, year: 2025, text: "midnight movie", narrative: "Nonton midnight sendirian. Filmnya biasa aja, tapi jalan pulang jam 2 pagi yang sepi itu justru bagian favoritku." },
+    { day: 3, monthIdx: 4, year: 2025, text: "senja di rooftop", narrative: "Naik ke rooftop pas senja. Kota keliatan tenang dari atas. Duduk lama sampai lampu-lampu nyala satu-satu." },
+    { day: 28, monthIdx: 3, year: 2025, text: "kopi & hujan deras", narrative: "Kehujanan deras di jalan, akhirnya ngampus ke kedai kopi. Malah jadi ngobrol dua jam soal hal-hal kecil yang hangat." },
   ]
 };
 
@@ -42,33 +42,109 @@ function tickClock() {
     `${HARI_ID[now.getDay()]}, ${now.getDate()} ${BULAN_ID[now.getMonth()]} ${now.getFullYear()}`;
 }
 
+let memoryFull = null; // simpan catatan full buat pop-up
+
 function renderMemory() {
   const t = state.throwback;
+  const card = document.getElementById("memoryCard");
   if (!t) {
     document.getElementById("memDay").textContent = "";
     document.getElementById("memMonth").textContent = "";
     document.getElementById("memYear").textContent = "";
     document.getElementById("memoryText").textContent = "Belum ada catatan setahun lalu di tanggal ini.";
+    memoryFull = null;
+    if (card) card.classList.remove("tappable");
     return;
   }
   document.getElementById("memDay").textContent = pad(t.day);
   document.getElementById("memMonth").textContent = BULAN_SINGKAT[t.monthIdx];
   document.getElementById("memYear").textContent = t.year;
   document.getElementById("memoryText").textContent = `"${t.text}"`;
+  // simpan versi full buat modal, plus tandai kartunya bisa di-tap
+  memoryFull = {
+    date: `${pad(t.day)} ${BULAN_SINGKAT[t.monthIdx]} ${t.year}`,
+    text: `"${t.text}"`,
+  };
+  if (card) card.classList.add("tappable");
 }
+
+// ---- Modal catatan (dipakai memory card; nanti bisa dipakai ulang buat quotes) ----
+function ensureModal() {
+  let overlay = document.getElementById("noteModal");
+  if (overlay) return overlay;
+  overlay = document.createElement("div");
+  overlay.id = "noteModal";
+  overlay.className = "note-modal";
+  overlay.innerHTML = `
+    <div class="note-modal__card" role="dialog" aria-modal="true">
+      <button class="note-modal__close" aria-label="Tutup">&times;</button>
+      <div class="note-modal__date" id="noteModalDate"></div>
+      <div class="note-modal__body" id="noteModalBody"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  // tutup kalau klik area gelap di luar kartu, atau klik tombol close
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay || e.target.closest(".note-modal__close")) closeModal();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeModal();
+  });
+  return overlay;
+}
+
+function openModal(dateText, bodyText) {
+  const overlay = ensureModal();
+  overlay.querySelector("#noteModalDate").textContent = dateText || "";
+  overlay.querySelector("#noteModalBody").textContent = bodyText || "";
+  overlay.classList.add("open");
+}
+
+function closeModal() {
+  const overlay = document.getElementById("noteModal");
+  if (overlay) overlay.classList.remove("open");
+}
+
+// Pasang listener tap di memory card (sekali aja pas load).
+(function wireMemoryTap() {
+  const card = document.getElementById("memoryCard");
+  if (!card) return;
+  card.addEventListener("click", () => {
+    if (memoryFull) openModal(memoryFull.date, memoryFull.text);
+  });
+})();
+
+let currentQuote = null; // quote yang lagi tampil (buat tap → buka catatan full)
 
 function renderRotatingQuote() {
   const el = document.getElementById("rotatingQuote");
   const list = state.quotes || [];
-  if (!list.length) { el.textContent = ""; return; }
+  if (!list.length) { el.textContent = ""; el.classList.remove("tappable"); return; }
   el.classList.add("fade");
   setTimeout(() => {
     const q = list[quoteIdx % list.length];
     el.textContent = `"${q.text}"`;
+    currentQuote = q;
+    el.classList.add("tappable");
     quoteIdx++;
     el.classList.remove("fade");
   }, 400);
 }
+
+// Pasang listener tap di quote (sekali aja) → buka catatan full hari itu.
+(function wireQuoteTap() {
+  const el = document.getElementById("rotatingQuote");
+  if (!el) return;
+  el.addEventListener("click", () => {
+    if (!currentQuote) return;
+    const date = `${pad(currentQuote.day)} ${BULAN_SINGKAT[currentQuote.monthIdx]} ${currentQuote.year}`;
+    // kalau ada narasi full hari itu (dari /api/entries), tampilin itu;
+    // kalau nggak ada, ya tampilin quote-nya aja.
+    const body = currentQuote.narrative && currentQuote.narrative.trim()
+      ? currentQuote.narrative
+      : `"${currentQuote.text}"`;
+    openModal(date, body);
+  });
+})();
 
 // Orbit dua cincin — niru "Life Story Standby":
 // - cincin luar: kartu gede, muter searah jarum jam (80s)
